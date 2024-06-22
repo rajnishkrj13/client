@@ -2,6 +2,7 @@ import React, { useEffect, useState,useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
+import { useUser } from './UserContext';
 
 const Dashboard = () => {
   const [responses, setResponses] = useState([]);
@@ -12,6 +13,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [editingRow, setEditingRow] = useState(null);
   const fileInputRefs = useRef({});
+  const { updateUser } = useUser();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,8 +37,10 @@ const Dashboard = () => {
         ]);
 
         setResponses(responsesData.data);
-        console.log();
         setUser(userData.data);
+        localStorage.setItem('user',JSON.stringify(userData.data));
+        localStorage.setItem('isAdmin', userData.data.email === 'treta@justorganik.com');
+        updateUser(userData.data);
       } catch (error) {
         console.error(error);
         setError('Failed to fetch data. Please try again later.');
