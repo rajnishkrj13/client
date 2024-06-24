@@ -1,18 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState,useRef } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
+import { useUser } from './UserContext';
 
-const Printing = ({ handleLogout }) => {
+const Printing = () => {
   const [responses, setResponses] = useState([]);
   const [files, setFiles] = useState({});
   const [fileNames, setFileNames] = useState({});
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const [editingRow, setEditingRow] = useState(null);
+  const fileInputRefs = useRef({});
+  const { updateUser } = useUser();
 
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem('token');
       if (!token) {
+        navigate('/login');
         return;
       }
       try {
@@ -31,10 +38,9 @@ const Printing = ({ handleLogout }) => {
 
         setResponses(responsesData.data);
         setUser(userData.data);
-
-        if (userData.data.email !== 'treta@justorganik.com') {
-          setError('Unauthorized access');
-        }
+        localStorage.setItem('user',JSON.stringify(userData.data));
+        localStorage.setItem('isAdmin', userData.data.email === 'treta@justorganik.com');
+        updateUser(userData.data);
       } catch (error) {
         console.error(error);
         setError('Failed to fetch data. Please try again later.');
@@ -42,7 +48,12 @@ const Printing = ({ handleLogout }) => {
     };
 
     fetchData();
-  }, []);
+  }, [navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    navigate('/login');
+  };
 
   const handleFileChange = (e, id) => {
     const file = e.target.files[0];
@@ -62,6 +73,25 @@ const Printing = ({ handleLogout }) => {
     setFileNames(newFileNames);
   };
 
+  const fetchUploads = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
+    try {
+      const responsesData = await axios.get('http://localhost:5000/api/responses', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setResponses(responsesData.data);
+    } catch (error) {
+      console.error(error);
+      setError('Failed to fetch data. Please try again later.');
+    }
+  };
+  
   const handleFileUpload = async (e, id) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
@@ -75,8 +105,7 @@ const Printing = ({ handleLogout }) => {
     formData.append('file', file);
     formData.append('fileName', fileName);
     formData.append('rowId', id); 
-   
-
+  
     try {
       const response = await axios.post('http://localhost:5000/api/upload', formData, {
         headers: {
@@ -84,37 +113,58 @@ const Printing = ({ handleLogout }) => {
           Authorization: `Bearer ${token}`
         }
       });
-      const updatedResponses = [...responses];
-      const foundResponseIndex = updatedResponses.findIndex(response => response.rowId === id);
-      if (foundResponseIndex !== -1) {
-        updatedResponses[foundResponseIndex].file = response.data.file;
-        updatedResponses[foundResponseIndex].fileName = fileName;
-        setResponses(updatedResponses);
-      }
+      const updatedResponses = responses.map(item => {
+        if (item.rowId === id) {
+          return {
+            ...item,
+            file: response.data.file,
+            fileName: fileName
+          };
+        }
+        return item;
+      });
+      setResponses(updatedResponses);
       setFiles(prevFiles => ({ ...prevFiles, [id]: null }));
       setFileNames(prevFileNames => ({ ...prevFileNames, [id]: '' }));
       setError(null);
+      setEditingRow(null);
+      if (fileInputRefs.current[id]) {
+        fileInputRefs.current[id].value = null;
+      }
+      fetchUploads();
     } catch (error) {
       console.error(error);
       setError('Failed to upload file. Please try again later.');
     }
   };
 
-  const handleFileDelete = async (id) => {
+   const handleFileDelete = async (rowId, fileId) => {
     const token = localStorage.getItem('token');
-
+  
     try {
-      const response = await axios.delete(`http://localhost:5000/api/delete/${id}`, {
+      const response = await axios.delete(`http://localhost:5000/api/delete/${fileId}`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-
+      
       if (response.data.success) {
-        const updatedResponses = responses.filter((response) => response.id !== id);
+        const updatedResponses = responses.filter((response) => response.id !== fileId);
         setResponses(updatedResponses);
-        setFiles(prevFiles => ({ ...prevFiles, [id]: null }));
-        setFileNames(prevFileNames => ({ ...prevFileNames, [id]: '' }));
+        setFiles(prevFiles => {
+          const newFiles = { ...prevFiles };
+          if (newFiles[rowId]) {
+            newFiles[rowId] = newFiles[rowId].filter(file => file.id !== fileId);
+          }
+          return newFiles;
+        });
+        setFileNames(prevFileNames => {
+          const newFileNames = { ...prevFileNames };
+          delete newFileNames[fileId];
+          return newFileNames;
+        });
+        
+        fetchUploads();
       } else {
         setError(response.data.message);
       }
@@ -133,11 +183,42 @@ const Printing = ({ handleLogout }) => {
   };
 
   const handleAddMore = (id) => {
-    const newFiles = { ...files, [id]: null };
-    const newFileNames = { ...fileNames, [id]: '' };
-    setFiles(newFiles);
-    setFileNames(newFileNames);
+    setEditingRow(id);
   };
+
+  const handleDownloadAll = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      const fileUrls = responses
+        .filter(response => response.file)
+        .map(response => ({
+          url: `http://localhost:5000/uploads/${response.file}`,
+          name: response.fileName || response.file
+        }));
+      
+      for (const { url, name } of fileUrls) {
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const blob = await response.blob();
+        const link = document.createElement('a');
+        const urlObject = URL.createObjectURL(blob);
+        link.href = urlObject;
+        link.setAttribute('download', name);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(urlObject);
+      }
+    } catch (error) {
+      console.error(error);
+      setError('Failed to download files. Please try again later.');
+    }
+  };
+  
+  
 
   const rows = [
     { id: 100001, eanCode: '8906070431008', itemCode: 'CR100', hsnCode: '10063020', productNameEn: 'Basmati Rice', productNameHi: 'Basmati Chawal', packingSize: '0.500', mrp: '150.00', shelfLife: '18', usp: '0.3', pouchBack: 'Image/file', pouchFront: 'Image/file', label: 'Image/file' },
@@ -152,10 +233,12 @@ const Printing = ({ handleLogout }) => {
       
       <h1>Product Information</h1>
       {error && <p>{error}</p>}
+      <button onClick={handleDownloadAll}>Download All Files</button>
+
       <table>
         <thead>
           <tr>
-            <th>Sr. No.</th>
+            {/* <th>Sr. No.</th> */}
             <th>EAN Code / Bar Code</th>
             <th>Item Code</th>
             <th>HSN Code</th>
@@ -165,15 +248,14 @@ const Printing = ({ handleLogout }) => {
             <th>MRP (INR)</th>
             <th>Shelf Life (Month)</th>
             <th>USP</th>
-            <th>Pouch Back</th>
-            <th>Pouch Front</th>
-            <th>Label</th>
+            <th>Pouch Back / Pouch Front / Label</th>
+
           </tr>
         </thead>
         <tbody>
           {rows.map((row) => (
             <tr key={row.id}>
-              <td>{row.id}</td>
+              {/* <td>{row.id}</td> */}
               <td>{row.eanCode}</td>
               <td>{row.itemCode}</td>
               <td>{row.hsnCode}</td>
@@ -184,74 +266,30 @@ const Printing = ({ handleLogout }) => {
               <td>{row.shelfLife}</td>
               <td>{row.usp}</td>
               <td>
-                {responses.find((response) => response.rowId === row.id) ? (
-                  <div>
-                    <a href={responses.find((response) => response.rowId === row.id).file}>{responses.find((response) => response.rowId === row.id).fileName}</a>
-                    <button onClick={() => handleFileDelete(row.id)}>Delete</button>
-                    <button onClick={() => handleAddMore(row.id)}>Add More</button>
+                {responses.filter(response => response.rowId === row.id).map(response => (
+                  <div key={response.id}>
+                    <a href={`http://localhost:5000/uploads/${response.file}`} target="_blank" rel="noopener noreferrer">
+                      {response.fileName || response.file}
+                    </a>
+                    <button onClick={() => handleFileDelete(row.id, response.id)}>Delete</button>
                   </div>
-                ) : (
+                ))}
+                <button onClick={() => handleAddMore(row.id)}>Add file</button>
+                {editingRow === row.id && (
                   <form onSubmit={(e) => handleFileUpload(e, row.id)}>
                     <input
                       type="text"
                       placeholder="Enter file name"
                       value={fileNames[row.id] || ''}
                       onChange={(e) => handleFileNameChange(e, row.id)}
+                      ref={(el) => (fileInputRefs.current[row.id] = el)}
                     />
-                    <input
-                      type="file"
-                      onChange={(e) => handleFileChange(e, row.id)}
-                    />
+                    <input type="file" accept=".jpg, .jpeg, .pdf" onChange={(e) => handleFileChange(e, row.id)} />
                     <button type="submit">Upload</button>
                   </form>
                 )}
               </td>
-              <td>
-                {responses.find((response) => response.rowId === row.id) ? (
-                  <div>
-                    <a href={responses.find((response) => response.rowId === row.id).file}>{responses.find((response) => response.rowId === row.id).fileName}</a>
-                    <button onClick={() => handleFileDelete(row.id)}>Delete</button>
-                    <button onClick={() => handleAddMore(row.id)}>Add More</button>
-                  </div>
-                ) : (
-                  <form onSubmit={(e) => handleFileUpload(e, row.id)}>
-                    <input
-                      type="text"
-                      placeholder="Enter file name"
-                      value={fileNames[row.id] || ''}
-                      onChange={(e) => handleFileNameChange(e, row.id)}
-                    />
-                    <input
-                      type="file"
-                      onChange={(e) => handleFileChange(e, row.id)}
-                    />
-                    <button type="submit">Upload</button>
-                  </form>
-                )}
-              </td>
-              <td>
-                {responses.find((response) => response.rowId === row.id) ? (
-                  <div>
-                    <a href={responses.find((response) => response.rowId === row.id).file}>{responses.find((response) => response.rowId === row.id).fileName}</a>
-                    <button onClick={() => handleFileDelete(row.id)}>Delete</button>
-                    <button onClick={() => handleAddMore(row.id)}>Add More</button>
-                  </div>
-                ) : (
-                  <form onSubmit={(e) => handleFileUpload(e, row.id)}>
-                    <input
-                      type="text"
-                      placeholder="Enter file name"
-                      value={fileNames[row.id] || ''}
-                      onChange={(e) => handleFileNameChange(e, row.id)}
-                    />
-                    <input
-                      type="file"
-                      onChange={(e) => handleFileChange(e, row.id)}
-                    />
-                    <button type="submit">Upload</button>
-                  </form>
-                )}
-              </td>
+              {/* <td>{new Date().toLocaleString()}</td> */}
             </tr>
           ))}
         </tbody>
@@ -261,4 +299,3 @@ const Printing = ({ handleLogout }) => {
 };
 
 export default Printing;
-

@@ -23,7 +23,7 @@ const Login = ({ handleLogin }) => {
       }
     } catch (error) {
       console.error(error);
-      setError('An error occurred during login. Please try again.');
+      setError('Please Enter Correct Login details.');
     }
   };
 
