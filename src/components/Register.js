@@ -64,10 +64,11 @@
 // export default Register;
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Register.css';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from './UserContext'; // Assuming you have a UserContext to get user information
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -76,6 +77,14 @@ const Register = () => {
   const [phone, setPhone] = useState('');
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { user } = useUser(); // Assuming you have a useUser hook to get user information
+
+  useEffect(() => {
+    // Redirect if user is not treta@justorganik.com
+    if (user && user.email !== 'treta@justorganik.com') {
+      navigate('/users'); // Redirect to homepage or any other appropriate page
+    }
+  }, [user, navigate]);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -128,5 +137,3 @@ const Register = () => {
 };
 
 export default Register;
-
-
