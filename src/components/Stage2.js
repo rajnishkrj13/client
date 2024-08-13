@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
@@ -26,19 +26,19 @@ const Stage2 = () => {
         const [responsesData, userData] = await Promise.all([
           axios.get('http://localhost:5000/api/responses', {
             headers: {
-              Authorization: `Bearer ${token}`
-            }
+              Authorization: `Bearer ${token}`,
+            },
           }),
           axios.get('http://localhost:5000/api/user', {
             headers: {
-              Authorization: `Bearer ${token}`
-            }
-          })
+              Authorization: `Bearer ${token}`,
+            },
+          }),
         ]);
 
         setResponses(responsesData.data);
         setUser(userData.data);
-        localStorage.setItem('user',JSON.stringify(userData.data));
+        localStorage.setItem('user', JSON.stringify(userData.data));
         localStorage.setItem('isAdmin', userData.data.email === 'treta@justorganik.com');
         updateUser(userData.data);
       } catch (error) {
@@ -50,10 +50,10 @@ const Stage2 = () => {
     fetchData();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem('token');
+  //   navigate('/login');
+  // };
 
   const handleFileChange = (e, id) => {
     const file = e.target.files[0];
@@ -82,8 +82,8 @@ const Stage2 = () => {
     try {
       const responsesData = await axios.get('http://localhost:5000/api/responses', {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       setResponses(responsesData.data);
     } catch (error) {
@@ -91,7 +91,7 @@ const Stage2 = () => {
       setError('Failed to fetch data. Please try again later.');
     }
   };
-  
+
   const handleFileUpload = async (e, id) => {
     e.preventDefault();
     const token = localStorage.getItem('token');
@@ -104,28 +104,28 @@ const Stage2 = () => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('fileName', fileName);
-    formData.append('rowId', id); 
-  
+    formData.append('rowId', id);
+
     try {
       const response = await axios.post('http://localhost:5000/api/upload', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      const updatedResponses = responses.map(item => {
+      const updatedResponses = responses.map((item) => {
         if (item.rowId === id) {
           return {
             ...item,
             file: response.data.file,
-            fileName: fileName
+            fileName: fileName,
           };
         }
         return item;
       });
       setResponses(updatedResponses);
-      setFiles(prevFiles => ({ ...prevFiles, [id]: null }));
-      setFileNames(prevFileNames => ({ ...prevFileNames, [id]: '' }));
+      setFiles((prevFiles) => ({ ...prevFiles, [id]: null }));
+      setFileNames((prevFileNames) => ({ ...prevFileNames, [id]: '' }));
       setError(null);
       setEditingRow(null);
       if (fileInputRefs.current[id]) {
@@ -138,32 +138,38 @@ const Stage2 = () => {
     }
   };
 
-   const handleFileDelete = async (rowId, fileId) => {
+  const handleFileDelete = async (rowId, fileId, fileName) => {
+    const confirmation = window.confirm(`Are you sure you want to delete the file "${fileName}"?`);
+    if (!confirmation) {
+      return;
+    }
+
     const token = localStorage.getItem('token');
-  
+
     try {
       const response = await axios.delete(`http://localhost:5000/api/delete/${fileId}`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       if (response.data.success) {
+        alert('File deleted successfully.');
         const updatedResponses = responses.filter((response) => response.id !== fileId);
         setResponses(updatedResponses);
-        setFiles(prevFiles => {
+        setFiles((prevFiles) => {
           const newFiles = { ...prevFiles };
           if (newFiles[rowId]) {
-            newFiles[rowId] = newFiles[rowId].filter(file => file.id !== fileId);
+            newFiles[rowId] = newFiles[rowId].filter((file) => file.id !== fileId);
           }
           return newFiles;
         });
-        setFileNames(prevFileNames => {
+        setFileNames((prevFileNames) => {
           const newFileNames = { ...prevFileNames };
           delete newFileNames[fileId];
           return newFileNames;
         });
-        
+
         fetchUploads();
       } else {
         setError(response.data.message);
@@ -190,17 +196,17 @@ const Stage2 = () => {
     const token = localStorage.getItem('token');
     try {
       const fileUrls = responses
-        .filter(response => response.file)
-        .map(response => ({
+        .filter((response) => response.file)
+        .map((response) => ({
           url: `http://localhost:5000/uploads/${response.file}`,
-          name: response.fileName || response.file
+          name: response.fileName || response.file,
         }));
-      
+
       for (const { url, name } of fileUrls) {
         const response = await fetch(url, {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
         const blob = await response.blob();
         const link = document.createElement('a');
@@ -218,25 +224,24 @@ const Stage2 = () => {
     }
   };
   
-  
-  
 
   const rows = [
-    { id:21, timeline: '5 To 8 Month', activity: 'Stage Two : Capacity building of FIG/FPO and Post Registration compliance', deliverables: '', means: '', budget: '' },
-    { id:22, timeline: '', activity: 'PFulfilment of post registration compliances, appointment of CEO/Manager & Accountant', deliverables: '1st General Body Meeting conducted Opening of Bank Account, PAN, GST etc.', means: 'GBM Minutes, Bank Account Number, PAN number, GST Number', budget: '' },
-    { id:23, timeline: '', activity: 'Identification of technology gaps and training needs for FPO Members & imparting training (TOT) to LRP and FPO Board members', deliverables: 'Technology gaps and Training needs identified and TOT conducted for LRP and FPO Board Members', means: 'Training Need Assessment report, Training Curriculum and TOT report submitted to NAFED', budget: '' },
-    { id:24, timeline: '', activity: 'Demonstrations for improved farming practices depending on crop / other products', deliverables: 'Minimum 5 crop demonstrations conducted per FPO', means: 'Crop demonstration report submitted to NAFED', budget: '' },
-    { id:25, timeline: '', activity: 'Training of farmers for Productivity Increase and access to markets', deliverables: 'Training of FIG/FPO Members at village level twice in a year', means: 'Training report, Participant List submitted to NAFED', budget: '' },
-    { id:25, timeline: '', activity: 'Membership drive for FIG and FPO continues', deliverables: 'Balance 50 % of the minimum numbers achieved', means: 'Share amount collected in FPO Bank account', budget: '' },
-    { id:26, timeline: '', activity: '', deliverables: '', means: '', budget: '' },
+    { id:14, timeline: '5 To 8 Month', activity: 'Stage Two : Capacity building of FIG/FPO and Post Registration compliance', deliverables: '', means: '', budget: '' },
+    { id:15, timeline: '', activity: 'PFulfilment of post registration compliances, appointment of CEO/Manager & Accountant', deliverables: '1st General Body Meeting conducted Opening of Bank Account, PAN, GST etc.', means: 'GBM Minutes, Bank Account Number, PAN number, GST Number', budget: '' },
+    { id:16, timeline: '', activity: 'Identification of technology gaps and training needs for FPO Members & imparting training (TOT) to LRP and FPO Board members', deliverables: 'Technology gaps and Training needs identified and TOT conducted for LRP and FPO Board Members', means: 'Training Need Assessment report, Training Curriculum and TOT report submitted to NAFED', budget: '' },
+    { id:17, timeline: '', activity: 'Demonstrations for improved farming practices depending on crop / other products', deliverables: 'Minimum 5 crop demonstrations conducted per FPO', means: 'Crop demonstration report submitted to NAFED', budget: '' },
+    { id:18, timeline: '', activity: 'Training of farmers for Productivity Increase and access to markets', deliverables: 'Training of FIG/FPO Members at village level twice in a year', means: 'Training report, Participant List submitted to NAFED', budget: '' },
+    { id:19, timeline: '', activity: 'Membership drive for FIG and FPO continues', deliverables: 'Balance 50 % of the minimum numbers achieved', means: 'Share amount collected in FPO Bank account', budget: '' },
+    { id:20, timeline: '', activity: '', deliverables: '', means: '', budget: '' },
 
   ];
 
+ 
   return (
     <div className="Content-container">
       {user && <p>Welcome, {user.name}</p>}
-      <button onClick={handleLogout}>Logout</button>
-      
+      {/* <button onClick={handleLogout}>Logout</button> */}
+
       <h1>FPO ALL STAGES</h1>
       {error && <p>{error}</p>}
       <button onClick={handleDownloadAll}>Download All Files</button>
@@ -261,12 +266,12 @@ const Stage2 = () => {
               <td>{row.means}</td>
               <td>{row.budget}</td>
               <td>
-                {responses.filter(response => response.rowId === row.id).map(response => (
+                {responses.filter((response) => response.rowId === row.id).map((response) => (
                   <div key={response.id}>
                     <a href={`http://localhost:5000/uploads/${response.file}`} target="_blank" rel="noopener noreferrer">
                       {response.fileName || response.file}
                     </a>
-                    <button onClick={() => handleFileDelete(row.id, response.id)}>Delete</button>
+                    <button onClick={() => handleFileDelete(row.id, response.id, response.fileName || response.file)}>Delete</button>
                   </div>
                 ))}
                 <button onClick={() => handleAddMore(row.id)}>Add file</button>
@@ -288,6 +293,11 @@ const Stage2 = () => {
             </tr>
           ))}
         </tbody>
+
+
+
+
+
       </table>
     </div>
   );

@@ -4,16 +4,24 @@
   align-items: center;
   padding: 10px;
   background-color: #333;
+  color: #fff;
+  position: sticky; /* or position: fixed; */
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  overflow-y: hidden; /* Prevent vertical scrolling */
 }
 
 .navbar-brand {
   color: #fff;
   text-decoration: none;
+  padding-left: 30px;
 }
 
 .navbar-links {
   list-style: none;
-  padding: 0;
+  padding-right: 50px;
 }
 
 .navbar-links li {
@@ -31,4 +39,8 @@
 
 .navbar-links button:hover, .navbar-links a:hover {
   text-decoration: underline;
+}
+
+.hidden {
+  display: none;
 }

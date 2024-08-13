@@ -50,10 +50,10 @@ const Dashboard = () => {
     fetchData();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem('token');
+  //   navigate('/login');
+  // };
 
   const handleFileChange = (e, id) => {
     const file = e.target.files[0];
@@ -228,43 +228,43 @@ const Dashboard = () => {
     { id :4, timeline: '0 To 3 Month', activity: 'Identification of Product specific clusters / villages and Local Resource Persons (LRP)', deliverables: 'List of Product specific clusters identified and LRPs', means: 'Copy of the report submitted to NAFED', budget: '' },
     { id :5, timeline: '0 To 3 Month', activity: 'Feasibility Analysis —Agri Produce Marketable Surplus, Input Requirement and break even estimates', deliverables: 'Various interface tables prepared', means: 'Copy of the report submitted to NAFED', budget: '' },
     { id :6, timeline: '0 To 3 Month', activity: 'Village Awareness meetings to identity potential farmers, opinion leaders, BF/LF etc', deliverables: 'List of farmers identified members for FPO (At Least 50% of minimum requirement)', means: 'List of farmers updated on the NAFED MIS/App', budget: '' },
-    { id :7, timeline: '', activity: '', deliverables: '', means: 'Sub Total', budget: '125000' },
+    { id :7, timeline: '', activity: '', deliverables: '', means: 'Invoice', budget: '125000' },
     { id :8, timeline: '1 To 4 Month', activity: 'Farmers of FIGs and their handholding', deliverables: 'Farmers Organized into FIGs (At least 50% of minimum requirement)', means: 'List of FIGs updated on the MIS', budget: '' },
     { id :9, timeline: '1 To 4 Month', activity: 'FIGS meeting & orientation for FPO vision building exercise and equity share collection ', deliverables: 'FIGS shown some trends/ indicators for collective action and share contribution', means: 'Share amount collected by the FPO promoters', budget: '' },
     { id :10, timeline: '1 To 4 Month', activity: 'Initiation of statutory process required for formation Of FPO like attainment of PAN, DIN for Directors', deliverables: 'FIGS shown some trends/ indicators for collective action and share contribution', means: 'Share amount collected by the FPO promoters', budget: '' },
     { id :11, timeline: '3 To 4 Month', activity: 'Framing of Bye-laws/MoA/AOA for incorporation of FPO', deliverables: 'Bye-laws/MoA/AoA prepared', means: 'Copy of Bye-laws', budget: '' },
     { id :12, timeline: '4 To 5 Month', activity: 'Application of Documents to ROC/Registration Authority of FPO', deliverables: 'FPOs registered under relevant act', means: 'Proof of applications made to Registration Authority', budget: '' },
-    { id :13, timeline: '', activity: '', deliverables: '', means: 'Sub Total', budget: '125000' },
+    { id :13, timeline: '', activity: '', deliverables: '', means: 'Invoice', budget: '125000' },
 
-    { id:21, timeline: '5 To 8 Month', activity: 'Stage Two : Capacity building of FIG/FPO and Post Registration compliance', deliverables: '', means: '', budget: '' },
-    { id:22, timeline: '', activity: 'PFulfilment of post registration compliances, appointment of CEO/Manager & Accountant', deliverables: '1st General Body Meeting conducted Opening of Bank Account, PAN, GST etc.', means: 'GBM Minutes, Bank Account Number, PAN number, GST Number', budget: '' },
-    { id:23, timeline: '', activity: 'Identification of technology gaps and training needs for FPO Members & imparting training (TOT) to LRP and FPO Board members', deliverables: 'Technology gaps and Training needs identified and TOT conducted for LRP and FPO Board Members', means: 'Training Need Assessment report, Training Curriculum and TOT report submitted to NAFED', budget: '' },
-    { id:24, timeline: '', activity: 'Demonstrations for improved farming practices depending on crop / other products', deliverables: 'Minimum 5 crop demonstrations conducted per FPO', means: 'Crop demonstration report submitted to NAFED', budget: '' },
-    { id:25, timeline: '', activity: 'Training of farmers for Productivity Increase and access to markets', deliverables: 'Training of FIG/FPO Members at village level twice in a year', means: 'Training report, Participant List submitted to NAFED', budget: '' },
-    { id:25, timeline: '', activity: 'Membership drive for FIG and FPO continues', deliverables: 'Balance 50 % of the minimum numbers achieved', means: 'Share amount collected in FPO Bank account', budget: '' },
-    { id:26, timeline: '', activity: '', deliverables: '', means: '', budget: '' },
+    { id:14, timeline: '5 To 8 Month', activity: 'Stage Two : Capacity building of FIG/FPO and Post Registration compliance', deliverables: '', means: '', budget: '' },
+    { id:15, timeline: '', activity: 'PFulfilment of post registration compliances, appointment of CEO/Manager & Accountant', deliverables: '1st General Body Meeting conducted Opening of Bank Account, PAN, GST etc.', means: 'GBM Minutes, Bank Account Number, PAN number, GST Number', budget: '' },
+    { id:16, timeline: '', activity: 'Identification of technology gaps and training needs for FPO Members & imparting training (TOT) to LRP and FPO Board members', deliverables: 'Technology gaps and Training needs identified and TOT conducted for LRP and FPO Board Members', means: 'Training Need Assessment report, Training Curriculum and TOT report submitted to NAFED', budget: '' },
+    { id:17, timeline: '', activity: 'Demonstrations for improved farming practices depending on crop / other products', deliverables: 'Minimum 5 crop demonstrations conducted per FPO', means: 'Crop demonstration report submitted to NAFED', budget: '' },
+    { id:18, timeline: '', activity: 'Training of farmers for Productivity Increase and access to markets', deliverables: 'Training of FIG/FPO Members at village level twice in a year', means: 'Training report, Participant List submitted to NAFED', budget: '' },
+    { id:19, timeline: '', activity: 'Membership drive for FIG and FPO continues', deliverables: 'Balance 50 % of the minimum numbers achieved', means: 'Share amount collected in FPO Bank account', budget: '' },
+    { id:20, timeline: '', activity: '', deliverables: '', means: '', budget: '' },
 
-    { id:31, timeline: '9 To 12 Month', activity: 'Stage Three: Preparation of Business Plan for FPO, Application for Matching equity &Trade Licences', deliverables: '', means: '', budget: '' },
-    { id:32, timeline: '', activity: 'Exposure Visit of Board Members to successful FPO business ventures ', deliverables: 'Board Members have understanding of FPO Business', means: 'Exposure visit report submitted to NAFED', budget: '' },
-    { id:33, timeline: '', activity: 'Continue Membership drive for share collection', deliverables: 'Matching Equity collected', means: 'Share amount collected in FPO Bank account', budget: '' },
-    { id:34, timeline: '', activity: 'Preparation of Business Plan', deliverables: 'Business plan prepared as per checklist Annex2(B)', means: 'Copy of Business Plan submitted to NAFED', budget: '' },
-    { id:35, timeline: '', activity: 'Application for Trade Licences if any to deal in Agri produce, Agri inputs etc.', deliverables: 'Trade Licences applied', means: 'Copy of Trade Licences', budget: '' },
-    { id:36, timeline: '', activity: '', deliverables: '', means: 'Sub Total', budget: '250000' },
+    { id:21, timeline: '9 To 12 Month', activity: 'Stage Three: Preparation of Business Plan for FPO, Application for Matching equity &Trade Licences', deliverables: '', means: '', budget: '' },
+    { id:22, timeline: '', activity: 'Exposure Visit of Board Members to successful FPO business ventures ', deliverables: 'Board Members have understanding of FPO Business', means: 'Exposure visit report submitted to NAFED', budget: '' },
+    { id:23, timeline: '', activity: 'Continue Membership drive for share collection', deliverables: 'Matching Equity collected', means: 'Share amount collected in FPO Bank account', budget: '' },
+    { id:24, timeline: '', activity: 'Preparation of Business Plan', deliverables: 'Business plan prepared as per checklist Annex2(B)', means: 'Copy of Business Plan submitted to NAFED', budget: '' },
+    { id:25, timeline: '', activity: 'Application for Trade Licences if any to deal in Agri produce, Agri inputs etc.', deliverables: 'Trade Licences applied', means: 'Copy of Trade Licences', budget: '' },
+    { id:26, timeline: '', activity: '', deliverables: '', means: 'Invoice', budget: '250000' },
 
-    { id:41, timeline: '13 To 18 Month', activity: 'Stage Four; Capacity building of FIG/FPO and Initiation of FPO Business', deliverables: '', means: '', budget: '' },
-    { id:42, timeline: '', activity: 'Stabilize Production System for specific Agri/Allied Commodity ', deliverables: 'Aggregations of Agri/AIIied Commodity through FPO', means: '', budget: '' },
-    { id:43, timeline: '', activity: 'Identification of technology gaps and training needs for FPO Members & imparting training (TOT) to LRPand FPO Board members', deliverables: 'Technology gaps and Training needs identified and TOT conducted for LRP and FPO Board Members', means: 'Training Need Assessment report, Training Curriculum and TOT report submitted to NAFED', budget: '' },
-    { id:44, timeline: '', activity: 'Demonstrations for improve d farming practices depending on crop / other products', deliverables: 'Minimum 5 crop demonstrations conducted per FPO', means: 'Crop demonstration report submitted to NAFED', budget: '' },
-    { id:45, timeline: '', activity: 'Training of farmers for Productivity Increase and access to markets', deliverables: 'Training of FIG/FPO Members at village level twice in a year', means: 'Training report, participant List submitted to NAFED', budget: '' },
-    { id:46, timeline: '', activity: 'Membership drive for FIG and FPO continues', deliverables: 'Increased Membership for the FPO', means: 'Share amount collected in FPO Bank account', budget: '' },
-    { id:47, timeline: '', activity: 'Starting FPO Business activity as per FPO Business Plan', deliverables: 'FPO Business started', means: 'Profit and LOSS statements, balance sheet etc.', budget: '' },
-    { id:48, timeline: '', activity: '', deliverables: '', means: 'Sub Total', budget: '250000' },
+    { id:27, timeline: '13 To 18 Month', activity: 'Stage Four; Capacity building of FIG/FPO and Initiation of FPO Business', deliverables: '', means: '', budget: '' },
+    { id:28, timeline: '', activity: 'Stabilize Production System for specific Agri/Allied Commodity ', deliverables: 'Aggregations of Agri/AIIied Commodity through FPO', means: '', budget: '' },
+    { id:29, timeline: '', activity: 'Identification of technology gaps and training needs for FPO Members & imparting training (TOT) to LRPand FPO Board members', deliverables: 'Technology gaps and Training needs identified and TOT conducted for LRP and FPO Board Members', means: 'Training Need Assessment report, Training Curriculum and TOT report submitted to NAFED', budget: '' },
+    { id:30, timeline: '', activity: 'Demonstrations for improve d farming practices depending on crop / other products', deliverables: 'Minimum 5 crop demonstrations conducted per FPO', means: 'Crop demonstration report submitted to NAFED', budget: '' },
+    { id:31, timeline: '', activity: 'Training of farmers for Productivity Increase and access to markets', deliverables: 'Training of FIG/FPO Members at village level twice in a year', means: 'Training report, participant List submitted to NAFED', budget: '' },
+    { id:32, timeline: '', activity: 'Membership drive for FIG and FPO continues', deliverables: 'Increased Membership for the FPO', means: 'Share amount collected in FPO Bank account', budget: '' },
+    { id:33, timeline: '', activity: 'Starting FPO Business activity as per FPO Business Plan', deliverables: 'FPO Business started', means: 'Profit and LOSS statements, balance sheet etc.', budget: '' },
+    { id:34, timeline: '', activity: '', deliverables: '', means: 'Invoice', budget: '250000' },
   ];
 
   return (
     <div className="Content-container">
       {user && <p>Welcome, {user.name}</p>}
-      <button onClick={handleLogout}>Logout</button>
+      {/* <button onClick={handleLogout}>Logout</button> */}
       
       <h1>FPO ALL STAGES</h1>
       {error && <p>{error}</p>}

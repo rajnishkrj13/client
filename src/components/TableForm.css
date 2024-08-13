@@ -1,0 +1,54 @@
+/* styles.css */
+.tttable {
+  width: 100%;
+  margin-left: 10px;
+  margin-right: 10px;
+  border-collapse: collapse;
+  overflow-x:none;
+ 
+}
+
+.tttable th, .tttable td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+.tttable th {
+  background-color: #f4f4f4;
+}
+
+@media (max-width: 768px) {
+  .tttable, .tttable thead, .tttable tbody, .tttable th, .tttable td, .tttable tr {
+    display: block;
+  }
+
+  .tttable tr {
+    margin-bottom: 15px;
+  }
+
+  .tttable td {
+    text-align: right;
+    padding-left: 50%;
+    position: relative;
+  }
+
+  .tttable td::before {
+    content: attr(data-label);
+    position: absolute;
+    left: 0;
+    width: 50%;
+    padding-left: 15px;
+    text-align: left;
+    font-weight: bold;
+    background-color: #f4f4f4;
+  }
+
+  .tttable th {
+    display:flexbox;
+    
+}
+
+
+
+};

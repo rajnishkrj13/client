@@ -1,4 +1,3 @@
-
 // import React, { useState } from 'react';
 // import axios from 'axios';
 // import './Login.css';
@@ -17,7 +16,20 @@
 //       if (response.data.success) {
 //         localStorage.setItem('token', response.data.token);
 //         handleLogin();
-//         navigate('/stage1');
+        
+//         // Check if email is treta@justorganik.com for redirect
+//         if (email === 'treta@justorganik.com') {
+//           navigate('/users');
+//         }
+//          else if (email === 'printing@justorganik.com') {
+//           navigate('/printing');
+//         }
+//         // else if (email === 'printingviewer@justorganik.com') {
+//         //   navigate('/PrintingViewer');
+//         // }
+//         else {
+//           navigate('/stage1');
+//         }
 //       } else {
 //         setError(response.data.message);
 //       }
@@ -54,10 +66,6 @@
 
 
 
-
-
-
-
 import React, { useState } from 'react';
 import axios from 'axios';
 import './Login.css';
@@ -69,6 +77,15 @@ const Login = ({ handleLogin }) => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // List of special emails for specific redirection
+  const specialEmails = [
+    'Sensational@justorganik.com',
+    'Vdhyas@justorganik.com',
+    'Stena@justorganik.com',
+    'Uae@justorganik.com',
+    'Vrl@justorganik.com',
+  ];
+
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -76,18 +93,14 @@ const Login = ({ handleLogin }) => {
       if (response.data.success) {
         localStorage.setItem('token', response.data.token);
         handleLogin();
-        
-        // Check if email is treta@justorganik.com for redirect
+
         if (email === 'treta@justorganik.com') {
           navigate('/users');
-        }
-         else if (email === 'printing@justorganik.com') {
+        } else if (email === 'printing@justorganik.com') {
           navigate('/printing');
-        }
-        // else if (email === 'printingviewer@justorganik.com') {
-        //   navigate('/PrintingViewer');
-        // }
-        else {
+        } else if (specialEmails.includes(email)) {
+          navigate('/tableform');
+        } else {
           navigate('/stage1');
         }
       } else {

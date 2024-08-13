@@ -19,12 +19,17 @@ const Navbar = ({ isAuthenticated, handleLogout }) => {
   const onLogoutClick = () => {
     localStorage.clear();
     handleLogout();
-    navigate('/login');
+    navigate('/');
+  };
+
+  const onBrandClick = (e) => {
+    e.preventDefault();
   };
 
   return (
     <nav className="navbar">
-      <Link to="/" className="navbar-brand">JO DMS</Link>
+      {/* <Link to="/" className="navbar-brand">JO DMS</Link> */}
+      <Link to="/" className="navbar-brand" onClick={onBrandClick}>JO DMS</Link>
       <ul className="navbar-links">
         {!isAuthenticated ? (
           <>
@@ -32,11 +37,20 @@ const Navbar = ({ isAuthenticated, handleLogout }) => {
           </>
         ) : (
           <>
-            {user && user.email === 'treta@justorganik.com' && (
+            {user && (user.email === 'treta@justorganik.com'||
+                      user.email === 'Sensational@justorganik.com'||
+                      user.email === 'Vdhyas@justorganik.com'||
+                      user.email === 'Stena@justorganik.com'||
+                      user.email === 'Uae@justorganik.com'||
+                      user.email === 'Vrl@justorganik.com'
+
+             )&& (
               <>
                 <li><Link to="/users">UserList</Link></li>
                 <li><Link to="/mailidpass">Mail</Link></li>
                 <li><Link to="/register">Register</Link></li>
+                <li><Link to="/tableform">Exports</Link></li>
+                <li><Link to="/exportuser">Exports User</Link></li>
                 
               </>
             )}
@@ -45,7 +59,14 @@ const Navbar = ({ isAuthenticated, handleLogout }) => {
                 <li><Link to="/Printing">Printing</Link></li>
               </>
             )}
-            {!user || (user.email !== 'printing@justorganik.com' && user.email !== 'treta@justorganik.com') && (
+            {!user || (
+            user.email !== 'Sensational@justorganik.com' && 
+            user.email !== 'treta@justorganik.com'&& 
+            user.email !== 'Vdhyas@justorganik.com'&& 
+            user.email !== 'Stena@justorganik.com'&& 
+            user.email !== 'Uae@justorganik.com' &&
+            user.email !== 'Vrl@justorganik.com'  
+            ) && (
               <>
                 <li><Link to="/stage1">Stage1</Link></li>
                 <li><Link to="/stage2">Stage2</Link></li>

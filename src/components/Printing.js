@@ -51,10 +51,10 @@ const Printing = () => {
     fetchData();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    navigate('/login');
-  };
+  // const handleLogout = () => {
+  //   localStorage.removeItem('token');
+  //   navigate('/login');
+  // };
 
   const handleFileChange = (e, id) => {
     const file = e.target.files[0];
@@ -3736,7 +3736,7 @@ const Printing = () => {
   return (
     <div className="Content-container">
       {user && <p>Welcome, {user.name}</p>}
-      <button onClick={handleLogout}>Logout</button>
+      {/* <button onClick={handleLogout}>Logout</button> */}
       
       <h1>Product Information</h1>
       {error && <p>{error}</p>}

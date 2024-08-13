@@ -1,19 +1,24 @@
+
+
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 import { useUser } from './UserContext';
 
-const Stage3 = () => {
+const UploadThree = () => {
   const [responses, setResponses] = useState([]);
   const [files, setFiles] = useState({});
   const [fileNames, setFileNames] = useState({});
   const [error, setError] = useState(null);
-  const [user, setUser] = useState(null);
+  const [setUser] = useState(null);
+  const [totalRows] = useState(1);
   const navigate = useNavigate();
   const [editingRow, setEditingRow] = useState(null);
   const fileInputRefs = useRef({});
   const { updateUser } = useUser();
+  const [passwordModal, setPasswordModal] = useState({ show: false, action: null, rowId: null, fileId: null });
+  const [password, setPassword] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,11 +54,6 @@ const Stage3 = () => {
 
     fetchData();
   }, [navigate]);
-
-  // const handleLogout = () => {
-  //   localStorage.removeItem('token');
-  //   navigate('/login');
-  // };
 
   const handleFileChange = (e, id) => {
     const file = e.target.files[0];
@@ -93,7 +93,7 @@ const Stage3 = () => {
   };
 
   const handleFileUpload = async (e, id) => {
-    e.preventDefault();
+    e.preventDefault(); // Ensure this is an event from a form submission
     const token = localStorage.getItem('token');
     const file = files[id];
     const fileName = fileNames[id];
@@ -105,6 +105,7 @@ const Stage3 = () => {
     formData.append('file', file);
     formData.append('fileName', fileName);
     formData.append('rowId', id);
+    formData.append('password', password); // include password in request
 
     try {
       const response = await axios.post('http://localhost:5000/api/upload', formData, {
@@ -132,25 +133,26 @@ const Stage3 = () => {
         fileInputRefs.current[id].value = null;
       }
       fetchUploads();
+      setPasswordModal({ show: false, action: null, rowId: null, fileId: null }); // hide modal after successful upload
     } catch (error) {
       console.error(error);
       setError('Failed to upload file. Please try again later.');
     }
   };
 
-  const handleFileDelete = async (rowId, fileId, fileName) => {
-    const confirmation = window.confirm(`Are you sure you want to delete the file "${fileName}"?`);
-    if (!confirmation) {
-      return;
-    }
+  const handleFileDelete = async (rowId, fileId) => {
+    setPasswordModal({ show: true, action: 'delete', rowId, fileId });
+  };
 
+  const confirmDelete = async () => {
+    const { rowId, fileId } = passwordModal;
     const token = localStorage.getItem('token');
-
     try {
       const response = await axios.delete(`http://localhost:5000/api/delete/${fileId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        data: { password }, // include password in request
       });
 
       if (response.data.success) {
@@ -175,108 +177,77 @@ const Stage3 = () => {
         setError(response.data.message);
       }
     } catch (error) {
-      if (error.response) {
-        console.error('Error response:', error.response.data);
-        console.error('Error status:', error.response.status);
-        console.error('Error headers:', error.response.headers);
-      } else if (error.request) {
-        console.error('Error request:', error.request);
-      } else {
-        console.error('Error message:', error.message);
-      }
+      console.error(error);
       setError('Failed to delete file. Please try again later.');
+    } finally {
+      setPasswordModal({ show: false, action: null, rowId: null, fileId: null });
     }
   };
 
   const handleAddMore = (id) => {
     setEditingRow(id);
+    setPasswordModal({ show: true, action: 'upload', rowId: id, fileId: null });
   };
 
-  const handleDownloadAll = async () => {
-    const token = localStorage.getItem('token');
-    try {
-      const fileUrls = responses
-        .filter((response) => response.file)
-        .map((response) => ({
-          url: `http://localhost:5000/uploads/${response.file}`,
-          name: response.fileName || response.file,
-        }));
-
-      for (const { url, name } of fileUrls) {
-        const response = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const blob = await response.blob();
-        const link = document.createElement('a');
-        const urlObject = URL.createObjectURL(blob);
-        link.href = urlObject;
-        link.setAttribute('download', name);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(urlObject);
-      }
-    } catch (error) {
-      console.error(error);
-      setError('Failed to download files. Please try again later.');
+  const handlePasswordConfirm = async () => {
+    if (passwordModal.action === 'delete') {
+      await confirmDelete();
+    } else if (passwordModal.action === 'upload') {
+      // Create a fake event to prevent calling preventDefault directly
+      const fakeEvent = { preventDefault: () => {} };
+      await handleFileUpload(fakeEvent, passwordModal.rowId);
     }
+    setPasswordModal({ show: false, action: null, rowId: null, fileId: null });
   };
-  
-  
-  
 
-  const rows = [
+  const generateRows = (startId, total) => {
+    return Array.from({ length: total }, (_, i) => ({ id: startId + i }));
+  };
 
-
-    { id:21, timeline: '9 To 12 Month', activity: 'Stage Three: Preparation of Business Plan for FPO, Application for Matching equity &Trade Licences', deliverables: '', means: '', budget: '' },
-    { id:22, timeline: '', activity: 'Exposure Visit of Board Members to successful FPO business ventures ', deliverables: 'Board Members have understanding of FPO Business', means: 'Exposure visit report submitted to NAFED', budget: '' },
-    { id:23, timeline: '', activity: 'Continue Membership drive for share collection', deliverables: 'Matching Equity collected', means: 'Share amount collected in FPO Bank account', budget: '' },
-    { id:24, timeline: '', activity: 'Preparation of Business Plan', deliverables: 'Business plan prepared as per checklist Annex2(B)', means: 'Copy of Business Plan submitted to NAFED', budget: '' },
-    { id:25, timeline: '', activity: 'Application for Trade Licences if any to deal in Agri produce, Agri inputs etc.', deliverables: 'Trade Licences applied', means: 'Copy of Trade Licences', budget: '' },
-    { id:26, timeline: '', activity: '', deliverables: '', means: 'Invoice', budget: '250000' },
-
-
-  ];
+  const rows = generateRows(99999997, totalRows);
 
   return (
     <div className="Content-container">
-      {user && <p>Welcome, {user.name}</p>}
-      {/* <button onClick={handleLogout}>Logout</button> */}
-
-      <h1>FPO ALL STAGES</h1>
-      {error && <p>{error}</p>}
-      <button onClick={handleDownloadAll}>Download All Files</button>
+      {passwordModal.show && (
+        <div className="password-modal">
+          <h3>{passwordModal.action === 'delete' ? 'Enter Password to Delete' : 'Enter Password to Add File'}</h3>
+          <input
+            type="password"
+            placeholder="Enter password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button onClick={handlePasswordConfirm}>
+            Confirm
+          </button>
+          <button onClick={() => setPasswordModal({ show: false, action: null, rowId: null, fileId: null })}>
+            Cancel
+          </button>
+        </div>
+      )}
+      {/* {error && <p>{error}</p>} */}
       <table>
         <thead>
           <tr>
-            <th>Timeline</th>
-            <th>Activity</th>
-            <th>Deliverables</th>
-            <th>Means of Verification</th>
-            <th>Budget</th>
-            <th>Upload Files</th>
-            <th>File and Date</th>
+            <th>Files</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((row) => (
             <tr key={row.id}>
-              <td>{row.timeline}</td>
-              <td>{row.activity}</td>
-              <td>{row.deliverables}</td>
-              <td>{row.means}</td>
-              <td>{row.budget}</td>
               <td>
-                {responses.filter((response) => response.rowId === row.id).map((response) => (
-                  <div key={response.id}>
-                    <a href={`http://localhost:5000/uploads/${response.file}`} target="_blank" rel="noopener noreferrer">
-                      {response.fileName || response.file}
-                    </a>
-                    <button onClick={() => handleFileDelete(row.id, response.id, response.fileName || response.file)}>Delete</button>
-                  </div>
-                ))}
+                {responses
+                  .filter((response) => response.rowId === row.id)
+                  .map((response) => (
+                    <div key={response.id}>
+                      <a href={`http://localhost:5000/uploads/${response.file}`} target="_blank" rel="noopener noreferrer">
+                        {response.fileName || response.file}
+                      </a>
+                      <button onClick={() => handleFileDelete(row.id, response.id, response.fileName || response.file)}>
+                        Delete
+                      </button>
+                    </div>
+                  ))}
                 <button onClick={() => handleAddMore(row.id)}>Add file</button>
                 {editingRow === row.id && (
                   <form onSubmit={(e) => handleFileUpload(e, row.id)}>
@@ -292,18 +263,15 @@ const Stage3 = () => {
                   </form>
                 )}
               </td>
-              <td>{new Date().toLocaleString()}</td>
             </tr>
           ))}
         </tbody>
-
-
-
-
-
       </table>
     </div>
   );
 };
 
-export default Stage3;
+export default UploadThree;
+
+
+

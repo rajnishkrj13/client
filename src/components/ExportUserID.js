@@ -1,36 +1,22 @@
-
 import React, { useState } from 'react';
 import axios from 'axios';
 import './MailidPass.css'; // Assuming you have some CSS for styling
 
 const accounts = [
-  { email: "treta@justorganik.com", password: "treta@justorganik.com" },
-  { email: "pipluagro@justorganik.com", password: "Password:fpo154" },
-  { email: "Malpuraagro@justorganik.com", password: "Password:fpo156" },
-  { email: "Ramganjmandi@justorganik.com", password: "Password:fpo158" },
-  { email: "Mabijasan@justorganik.com", password: "Password:fpo168" },
-  { email: "Tharmaniorganic@justorganik.com", password: "Password:fpo162" },
-  { email: "sajani@justorganik.com", password: "Password:fpo164" },
-  { email: "Shivshakti@justorganik.com", password: "Password:fpo166" },
-  { email: "Chachiotvalley@justorganik.com", password: "Password:fpo160" },
-  { email: "Gadhpatitreta@justorganik.com", password: "Password:fpo170" },
-  { email: "Nihritreta@justorganik.com", password: "Password:fpo172" },
-  { email: "Farukhnagartreta@justorganik.com", password: "Password:fpo174" },
-  { email: "Pataudifed@justorganik.com", password: "Password:fpo176" },
-  { email: "Naharwadifed@justorganik.com", password: "Password:fpo178" },
-  { email: "Jatusanafed@justorganik.com", password: "Password:fpo180" },
-  { email: "Krshakswayat@justorganik..com", password: "Password:fpo182" },
-  { email: "Gomtifed@justorganik.com", password: "Password:fpo184" },
-  { email: "Sonalifed@justorganik.com", password: "Password:fpo186" },
-  { email: "Nandadevi@justorganik.com", password: "Password:fpo188" }
+  { email: "Sensational@justorganik.com", password: "Sen@#JO123" },
+  { email: "Vdhyas@justorganik.com", password: "Vdh@#JO124" },
+  { email: "Stena@justorganik.com", password: "Ste@#JO125" },
+  { email: "Uae@justorganik.com", password: "Uae@#JO126" },
+  { email: "Vrl@justorganik.com", password: "Vrl@#JO127" },
 ];
 
-const MailidPass = ({ handleLogin }) => {
+
+const ExportUserID = ({ handleLogin }) => {
   const [selectedAccount, setSelectedAccount] = useState(accounts[0]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const handleLoginClick = async () => {
+    const handleLoginClick = async () => {
     setLoading(true);
     setError(null);
     try {
@@ -49,11 +35,9 @@ const MailidPass = ({ handleLogin }) => {
         handleLogin();
 
         // Redirect logic based on email
-        if (selectedAccount.email === "treta@justorganik.com") {
-          window.open('http://localhost:3000/users', '_blank');
-        } else {
-          window.open('http://localhost:3000/stage1', '_blank');
-        }
+        if (emailList.includes(selectedAccount.email)) {
+          window.open('http://localhost:3000/tableform', '_blank');
+        } 
       } else {
         setError(response.data.message);
       }
@@ -64,6 +48,14 @@ const MailidPass = ({ handleLogin }) => {
       setLoading(false);
     }
   };
+  const emailList = [
+    "Sensational@justorganik.com",
+    "Vdhyas@justorganik.com",
+    "Stena@justorganik.com",
+    "Uae@justorganik.com",
+    "Vrl@justorganik.com",
+  ];
+  
 
   return (
     <div style={{ textAlign: 'center', marginTop: '50px' }}>
@@ -91,4 +83,4 @@ const MailidPass = ({ handleLogin }) => {
   );
 };
 
-export default MailidPass;
+export default ExportUserID;
